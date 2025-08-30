@@ -26,7 +26,7 @@ const suite = new Benchmark.Suite;
 function add(name, fn) {
   suite.add(name, {
     defer: true,
-    delay: 0.1,
+    delay: 0.5,
     async fn(deferred) {
       await fn();
       deferred.resolve();
@@ -36,14 +36,10 @@ function add(name, fn) {
 
 add('no submit + map write', async () => {
   await bW.mapAsync(GPUMapMode.WRITE);
-  bW.unmap();
-});
-add('no submit + map write + getMappedRange', async () => {
-  await bW.mapAsync(GPUMapMode.WRITE);
   bW.getMappedRange();
   bW.unmap();
 });
-add('submit unrelated + map write + getMappedRange', async () => {
+add('submit unrelated + map write', async () => {
   const enc = device.createCommandEncoder();
   enc.copyBufferToBuffer(b0, 0, bR, 0, 4);
   device.queue.submit([enc.finish()]);
@@ -51,7 +47,7 @@ add('submit unrelated + map write + getMappedRange', async () => {
   bW.getMappedRange();
   bW.unmap();
 });
-add('submit related + map write + getMappedRange', async () => {
+add('submit related + map write', async () => {
   const enc = device.createCommandEncoder();
   enc.copyBufferToBuffer(bW, 0, b0, 0, 4);
   device.queue.submit([enc.finish()]);
